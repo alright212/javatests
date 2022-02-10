@@ -1,0 +1,4 @@
+public void findsLongestStreak() {
+        assertThat(Code.longestStreak(""), is(0));
+        // other test cases for this method
+    }
