@@ -1,0 +1,7 @@
+ public void sumsIgnoringDuplicates() {
+        assertThat(Code.sumIgnoringDuplicates(arrayOf(1, 1)), is(1));
+
+        assertThat(Code.sumIgnoringDuplicates(arrayOf(1, 2, 1, 3, 2)), is(6));
+
+        assertThat(Code.sumIgnoringDuplicates(arrayOf(1, 2, 3)), is(6));
+    }
