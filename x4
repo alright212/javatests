@@ -1,0 +1,111 @@
+package oo.hide;
+
+public class PointSet {
+    private Point points[];
+    private int currentSetSize=0;
+
+    
+    public PointSet(int capacity) {
+
+        this.points = new Point[capacity];
+        this.currentSetSize = 0;
+    }
+
+    //default constructor
+    public PointSet() {
+        this(10);
+
+    }
+
+
+    public void add(Point point) {
+        if (currentSetSize < this.points.length) {
+            if (!this.contains(point)) {
+                this.points[currentSetSize] = point;
+                currentSetSize++;
+            }
+        }
+    }
+
+
+    public int size() {
+
+        return currentSetSize;
+    }
+
+
+    public boolean contains(Point point) {
+        boolean isFound = false;
+        if (this.currentSetSize > 0) {
+            for (Point p : points) {
+                if (p != null && p.equals(point)) {
+                    isFound = true;
+                    break;
+                }
+            }
+        }
+        return isFound;
+    }
+
+
+    public PointSet subtract(PointSet other) {
+        PointSet sp = new PointSet();
+        if (this.currentSetSize > 0) {
+            for (Point currentPointSet : this.points) {
+                if (currentPointSet != null && !other.contains(currentPointSet)) {
+                    sp.add(currentPointSet);
+                }
+            }
+        }
+        return sp;
+    }
+    public PointSet intersect(PointSet other) {
+        PointSet sp = new PointSet();
+        Point[] points1 = this.points;
+        for (int i = 0; i < points1.length; i++) {
+            Point currentPointSet = points1[i];
+            if (other.contains(currentPointSet)) {
+                sp.add(currentPointSet);
+            }
+        }
+        return sp;
+    }
+
+
+    public String toString() {
+        String output = "";
+        for (int i = 0; i < currentSetSize; i++) {
+            Point currentPoint = this.points[i];
+            output += currentPoint;
+            output += (i == currentSetSize - 1 ? "" : ", ");
+        }
+        return output;
+    }
+
+
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        PointSet sp = (PointSet) obj;
+        if (sp.size() == this.size()) {
+            boolean isMatched = true;
+            Point[] points1 = this.points;
+            for (int i = 0; i < points1.length; i++) {
+                Point p = points1[i];
+                if (p != null && !sp.contains(p)) {
+                    isMatched = false;
+                    break;
+                }
+            }
+            return isMatched;
+        } else {
+            return false;
+        }
+
+    }
+
+}
+
+
