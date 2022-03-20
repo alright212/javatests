@@ -1,0 +1,43 @@
+//Write a C program that can calculate boolean expressions with users input.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char input1[100];
+    char input2[100];
+    char input3[100];
+
+    printf("Enter the first value: ");
+    scanf("%s", input1);
+
+    printf("Enter the second value: ");
+    scanf("%s", input2);
+
+    printf("Enter the third value: ");
+    scanf("%s", input3);
+
+    int val1 = atoi(input1);
+    int val2 = atoi(input2);
+    int val3 = atoi(input3);
+
+    if (val1 == 1 && val2 == 1 && val3 == 1)
+        printf("Result: True\n");
+    else if (val1 == 1 && val2 == 1 && val3 == 0)
+        printf("Result: False\n");
+    else if (val1 == 1 && val2 == 0 && val3 == 1)
+        printf("Result: False\n");
+    else if (val1 == 1 && val2 == 0 && val3 == 0)
+        printf("Result: False\n");
+    else if (val1 == 0 && val2 == 1 && val3 == 1)
+        printf("Result: False\n");
+    else if (val1 == 0 && val2 == 1 && val3 == 0)
+        printf("Result: False\n");
+    else if (val1 == 0 && val2 == 0 && val3 == 1)
+        printf("Result: False\n");
+    else if (val1 == 0 && val2 == 0 && val3 == 0)
+        printf("Result: False\n");
+
+    return 0;
+}
