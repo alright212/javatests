@@ -1,0 +1,57 @@
+Write a C Program to write a sentence to a file.This program stores a sentence entered by the user in a file.
+
+
+
+
+
+#include <stdio.h>
+
+#include <string.h>
+
+#include <fcntl.h>
+
+#include <stdlib.h>
+
+#define SIZE 50
+
+int main(void)
+
+{
+
+FILE *fp;
+
+char sentence[SIZE];
+
+fp = fopen(" sentence.txt ", "w");
+
+if (fp == NULL)
+
+{
+
+fprintf(stderr, "Cannot open file \" sentence.txt \"
+
+");
+
+return 1;
+
+}
+
+if (fwrite(sentence, 1, SIZE, fp) != SIZE)
+
+{
+
+fclose(fp);
+
+fprintf(stderr, "Failed to write sentence to file \" sentence.txt \"
+
+");
+
+return 1;
+
+}
+
+fclose(fp);
+
+return 0;
+
+}
