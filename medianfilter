@@ -1,0 +1,69 @@
+//Write a C program to create image noise correction filter using the median filter technique.
+
+#include <stdio.h> 
+#include <stdlib.h> 
+
+#define MAX_SIZE 100 
+
+void readImage(int a[MAX_SIZE][MAX_SIZE], int *r, int *c); 
+void printImage(int a[MAX_SIZE][MAX_SIZE], int r, int c); 
+
+void main() 
+{ 
+	int a[MAX_SIZE][MAX_SIZE]; 
+	int i, j, r, c, k; 
+	readImage(a, &r, &c); 
+	int b[3][3]; 
+	
+	for (i = 1; i < r - 1; i++) { 
+		for (j = 1; j < c - 1; j++) { 
+
+			int p = 0; 
+			for (k = -1; k <= 1; k++) { 
+				for (int l = -1; l <= 1; l++) { 
+					b[p][0] = a[i + k][j + l]; 
+					p++; 
+				} 
+			} 
+
+			for (int m = 0; m < 3; m++) { 
+				for (int l = 0; l < 2; l++) { 
+					for (int p = 0; p < 2 - l; p++) { 
+						if (b[p][m] > b[p + 1][m]) { 
+							int temp = b[p][m]; 
+							b[p][m] = b[p + 1][m]; 
+							b[p + 1][m] = temp; 
+						} 
+					} 
+				} 
+			} 
+
+			a[i][j] = b[1][1]; 
+		} 
+	} 
+
+	printf("The image after applying Median Filter : \n"); 
+	printImage(a, r, c); 
+} 
+
+void readImage(int a[MAX_SIZE][MAX_SIZE], int *r, int *c) 
+{ 
+	printf("Enter the number of rows and columns : "); 
+	scanf("%d %d", r, c); 
+	printf("Enter the elements : \n"); 
+	for (int i = 0; i < *r; i++) { 
+		for (int j = 0; j < *c; j++) { 
+			scanf("%d", &a[i][j]); 
+		} 
+	} 
+} 
+
+void printImage(int a[MAX_SIZE][MAX_SIZE], int r, int c) 
+{ 
+	for (int i = 0; i < r; i++) { 
+		for (int j = 0; j < c; j++) { 
+			printf("%d\t", a[i][j]); 
+		} 
+		printf("\n"); 
+	} 
+}
