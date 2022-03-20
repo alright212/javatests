@@ -1,0 +1,75 @@
+Write a C program, that can convert inches to centimeters.
+
+
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <math.h>
+
+int inches_to_centimeters(int inches);
+
+int centimeters_to_inches(int centimeters);
+
+void print_result(int inches, int centimeters);
+
+// main()
+
+int main()
+
+{
+
+int inches;
+
+int centimeters;
+
+printf("Inches to centimeters: %d
+
+", inches_to_centimeters(inches));
+
+printf("Centimeters to inches: %d
+
+", centimeters_to_inches(centimeters));
+
+print_result(inches, centimeters);
+
+return 0;
+
+}
+
+
+
+int inches_to_centimeters(int inches)
+
+{
+
+return (inches * 3.14) / 2;
+
+}
+
+
+
+int centimeters_to_inches(int centimeters)
+
+{
+
+return (centimeters * 0.39) / 0.79;
+
+}
+
+
+
+void print_result(int inches, int centimeters)
+
+{
+
+printf("Inches: %d
+
+", inches);
+
+printf("Centimeters: %d
+
+", centimeters);
+
+}
