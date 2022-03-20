@@ -1,0 +1,19 @@
+//Write a C program to calculate boolean algebra with user input that asks for 2 variables.
+
+#include <stdio.h>
+
+int main()
+{
+    int a, b;
+    
+    printf("Please input 2 variables: ");
+    scanf("%d %d", &a, &b);
+    
+    printf("a AND b = %d\n", a & b);
+    printf("a OR b = %d\n", a | b);
+    printf("a XOR b = %d\n", a ^ b);
+    printf("NOT a = %d\n", ~a);
+    printf("NOT b = %d\n", ~b);
+    
+    return 0;
+}
