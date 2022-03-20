@@ -1,0 +1,23 @@
+Write a C program that calculates the circumference of all planets in the solar system, but input comes from a text file.
+
+#include <stdio.h>
+#include <math.h>
+
+int main(void)
+{
+    FILE *fp;
+    fp = fopen("planets.txt", "r");
+
+    float pi = 3.14159265358979323846;
+    float circumference;
+    float radius;
+
+    while (fscanf(fp, "%f", &radius) == 1)
+    {
+        circumference = 2 * pi * radius;
+        printf("%f\n", circumference);
+    }
+
+    fclose(fp);
+    return 0;
+}
