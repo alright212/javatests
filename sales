@@ -1,0 +1,123 @@
+Selle ülesande koodis ei tohiks olla ühtki tavalist tsüklit (for, while).
+   
+   Failis src/fp/sales/sales-data.csv on andmed müügi kohta. Kasutades 
+   Stream API võimalusi leidke
+   
+   a) kogu müük;
+   b) müük kategoorias "Office Supplies";
+   c) müük vahemikul 2016-01-01 kuni 2016-03-31;
+   d) kolme kallima toote id-d tähestiku järjekorras;
+   e) kõige suurema müügiga osariigid.
+
+   Faili lugemiseks on:
+     
+     Files.readAllLines(Paths.get(FILE_PATH));
+     
+   Kirjed on eraldatud tabulaatoriga ja need saab osadeks nii:
+   
+     line.split("\t");
+     
+   Stringist saate kuupäeva nii:
+
+     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+     LocalDate.parse(<kuupäev stringina>, formatter);   
+To convert a string to a number:
+
+      Double.parseDouble (<number as string>);
+   
+    - Exceptions
+   
+    You can also catch and handle possible exceptions (IOException,
+    ParseException) in the main method.
+   
+    - Testing
+   
+    You can test your code with the following files:
+   
+    src / fp / sales / sales-data-1.csv
+    src / fp / sales / sales-data-2.csv
+    src / fp / sales / sales-data-3.csv
+
+*/
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Stream;
+
+public class SalesAnalysis {
+
+    private final String FILE_PATH = "src/fp/sales/sales-data.csv";
+
+    public static void main(String[] args) {
+        SalesAnalysis salesAnalysis = new SalesAnalysis();
+        salesAnalysis.run();
+    }
+
+    private void run() {
+        // code here
+    }
+
+    // - In the main method, start by reading the file into memory.
+    private List<String> readFile() {
+        try {
+            return Files.readAllLines(Paths.get(FILE_PATH));
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
+    // a) all sales
+    public List<Sale> allSales() {
+        return readFile().stream()
+                .map(row -> new Sale(row.split("\t")))
+                .collect(Collectors.toList());
+    }
+
+    // b) sales in the "Office Supplies" category
+    public List<Sale> salesInCategory() {
+        return readFile().stream()
+                .map(row -> new Sale(row.split("\t")))
+                .filter(sale -> sale.getCategory().equals("Office Supplies"))
+                .collect(Collectors.toList());
+    }
+
+    // c) sales between 01/01/2016 and 31/03/2016
+    public List<Sale> salesBetween() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        return readFile().stream()
+                .map(row -> new Sale(row.split("\t")))
+                .filter(sale -> LocalDate.parse(sale.getSaleDate(), formatter).isAfter(LocalDate.parse("01.01.2016", formatter))
+                        && LocalDate.parse(sale.getSaleDate(), formatter).isBefore(LocalDate.parse("31.03.2016", formatter)))
+                .collect(Collectors.toList());
+    }
+
+    // d) the ids of the three most expensive products in alphabetical order
+    public List<String> mostExpensive() {
+        return readFile().stream()
+                .map(row -> new Sale(row.split("\t")))
+                .sorted((sale1, sale2) -> Double.compare(sale2.getTotalPrice(),sale1.getTotalPrice()))
+                .limit(3)
+                .map(sale -> sale.getProduct_id())
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.toList());
+
+    }
+
+    // e) the highest-selling states
+    public List<String> highestSelling() {
+        return readFile().stream()
+                .map(row -> new Sale(row.split("\t")))
+                .collect(Collectors.groupingBy(
+                        sale -> sale.getState(),
+                        Collectors.summingDouble(Sale::getTotalPrice)
+                ))
+                .entrySet()
+                .stream()
+                .sorted((state1, state2) -> Double.compare(state2.getValue(),state1.getValue()))
+                .map(state -> state.getKey())
+                .collect(Collectors.toList());
+    }
+}
