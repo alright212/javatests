@@ -1,0 +1,28 @@
+/*Write a recursive function (without cycles and global variables, the function calls itself) 
+that finds how much of the middle of the word is not symmetric. 
+The part that is the same on both sides of the word is symmetrical. 
+The length of the non-symmetrical part must be returned.*/
+
+
+public class Exercise {
+    public static void main(String[] args) {
+        System.out.println(recAsymmetryCount("aatereaa"));
+        System.out.println(recAsymmetryCount(""));
+        System.out.println(recAsymmetryCount("aa"));
+        System.out.println(recAsymmetryCount("tere"));
+        System.out.println(recAsymmetryCount("kirik"));
+    }
+
+    public static int recAsymmetryCount(String str) {
+        if (str.length() == 0) {
+            return 0;
+        }
+        if (str.length() == 1) {
+            return 1;
+        }
+        if (str.charAt(0) == str.charAt(str.length() - 1)) {
+            return recAsymmetryCount(str.substring(1, str.length() - 1));
+        }
+        return str.length();
+    }
+}
