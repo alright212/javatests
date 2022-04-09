@@ -1,0 +1,53 @@
+/*removeDuplicates (String str) - retrieves a word and removes all consecutive occurrences (returns a word in which consecutive occurrences have been removed). "aaabbca" => "abca".
+countDigits (String str) - retrieves the word and returns the integer (0-9) of the word. "12b3c1" => 4
+xyBalance (String str) - retrieves the word and returns whether the given word is "xy-balanced". A word is "xy-balanced" if there is one 'y' character at the end of each 'x' character. One 'y' can balance multiple 'x' symbols. For example, "xxy" is balanced, "xyx" is not.*/
+
+
+package ee.ttu.iti0202.string;
+
+public class StringOperations {
+	
+	public static String removeDuplicates(String str) {
+		String result = "";
+		for (int i = 0; i < str.length(); i++) {
+			if (i == 0) {
+				result += str.charAt(i);
+			} else {
+				if (str.charAt(i) != str.charAt(i - 1)) {
+					result += str.charAt(i);
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static int countDigits(String str) {
+		int count = 0;
+		for (int i = 0; i < str.length(); i++) {
+			if (Character.isDigit(str.charAt(i))) {
+				count++;
+			}
+		}
+		return count;
+	}
+	
+	public static boolean xyBalance(String str) {
+		boolean result = true;
+		for (int i = 0; i < str.length(); i++) {
+			if (str.charAt(i) == 'x') {
+				result = false;
+			}
+			if (str.charAt(i) == 'y') {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(removeDuplicates("aaabbca"));
+		System.out.println(countDigits("12b3c1"));
+		System.out.println(xyBalance("xxy"));
+		System.out.println(xyBalance("xyx"));
+	}
+}
