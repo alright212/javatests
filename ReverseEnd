@@ -1,0 +1,14 @@
+/*Write a method that returns a subword with a specified length from the end of a given word. 
+The second argument (subword length) is always less than equal to the length of the speech.
+*/
+public class Exercise {
+public static String reverseEnd(String str, int n) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = str.length() - n; i < str.length(); i++) {
+            sb.append(str.charAt(i));
+        }
+        return sb.reverse().toString();
+    }
+
+
+}
