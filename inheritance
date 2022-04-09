@@ -1,0 +1,368 @@
+From eb9b2b1798fc2c187265f7ff0a7e6e731e452de3 Mon Sep 17 00:00:00 2001
+From: GlenKink <glen.kink@gmail.com>
+Date: Tue, 5 Apr 2022 21:47:41 +0300
+Subject: [PATCH] 5.apr2147
+
+---
+ src/inheritance/analyser/SalesAnalyser.java   | 21 +++++
+ .../sender/AbstractLetterSender.java          | 28 +++++++
+ src/junit/Code.java                           | 29 +++++++
+ src/junit/Tests.java                          | 69 ++++++++++++++++
+ src/junit/sales/SalesRecord.java              | 41 ++++++++++
+ src/junit/sales/TopSalesFinder.java           | 33 ++++++++
+ src/junit/sales/TopSalesFinderTests.java      | 79 +++++++++++++++++++
+ 7 files changed, 300 insertions(+)
+ create mode 100644 src/inheritance/analyser/SalesAnalyser.java
+ create mode 100644 src/inheritance/sender/AbstractLetterSender.java
+ create mode 100644 src/junit/Code.java
+ create mode 100644 src/junit/Tests.java
+ create mode 100644 src/junit/sales/SalesRecord.java
+ create mode 100644 src/junit/sales/TopSalesFinder.java
+ create mode 100644 src/junit/sales/TopSalesFinderTests.java
+
+diff --git a/src/inheritance/analyser/SalesAnalyser.java b/src/inheritance/analyser/SalesAnalyser.java
+new file mode 100644
+index 0000000..1867507
+--- /dev/null
++++ b/src/inheritance/analyser/SalesAnalyser.java
+@@ -0,0 +1,21 @@
++package inheritance.analyser;
++
++import java.util.List;
++
++public abstract sealed class SalesAnalyser permits DifferentiatedTaxSalesAnalyser, FlatTaxSalesAnalyser, TaxFreeSalesAnalyser {
++
++    protected List<SalesRecord> records;
++
++    public SalesAnalyser(List<SalesRecord> records) {
++        this.records = records;
++    }
++
++
++    protected abstract Double getTotalSales();
++
++    protected abstract Double getTotalSalesByProductId(String id);
++
++    protected abstract String getIdOfMostPopularItem();
++
++    protected abstract String getIdOfItemWithLargestTotalSales();
++}
+\ No newline at end of file
+diff --git a/src/inheritance/sender/AbstractLetterSender.java b/src/inheritance/sender/AbstractLetterSender.java
+new file mode 100644
+index 0000000..54f3bc5
+--- /dev/null
++++ b/src/inheritance/sender/AbstractLetterSender.java
+@@ -0,0 +1,28 @@
++package inheritance.sender;
++
++import java.time.LocalTime;
++
++public abstract class AbstractLetterSender {
++    protected final LocalTime currentTime;
++
++    public AbstractLetterSender(LocalTime currentTime) {
++        this.currentTime = currentTime;
++    }
++
++    public abstract void sendLetter();
++
++    protected String getTimeOfDayString() {
++
++        int hour = currentTime.getHour();
++
++        if (hour > 5 && hour <= 11) {
++            return "morning";
++        } else if (hour > 11 && hour <= 17) {
++            return "afternoon";
++        } else if (hour > 17 && hour <= 20) {
++            return "evening";
++        } else {
++            return "night";
++        }
++    }
++}
+diff --git a/src/junit/Code.java b/src/junit/Code.java
+new file mode 100644
+index 0000000..024e0bb
+--- /dev/null
++++ b/src/junit/Code.java
+@@ -0,0 +1,29 @@
++package junit;
++
++public class Code {
++
++    public static boolean isSpecial(int candidate) {
++        return false;
++    }
++
++    public static int longestStreak(String inputString) {
++        return 0;
++    }
++
++    public static Character mode(String inputString) {
++        return null;
++    }
++
++    public static int getCharacterCount(String allCharacters, char targetCharacter) {
++        return 0;
++    }
++
++    public static int[] removeDuplicates(int[] integers) {
++        return null;
++    }
++
++    public static int sumIgnoringDuplicates(int[] integers) {
++        return 0;
++    }
++
++}
+diff --git a/src/junit/Tests.java b/src/junit/Tests.java
+new file mode 100644
+index 0000000..5d5f701
+--- /dev/null
++++ b/src/junit/Tests.java
+@@ -0,0 +1,69 @@
++package junit;
++
++import org.junit.Test;
++
++import static org.hamcrest.CoreMatchers.*;
++import static org.hamcrest.MatcherAssert.assertThat;
++import static org.junit.Assert.*;
++
++@SuppressWarnings("PMD")
++public class Tests {
++
++    @Test
++    public void equalityExamples() {
++
++    }
++
++    @Test
++    public void assertThatAndAssertEqualsExample() {
++
++    }
++
++    @Test
++    public void findsSpecialNumbers() {
++        assertTrue(Code.isSpecial(0));
++
++        // other test cases for isSpecial() method
++    }
++
++    @Test
++    public void findsLongestStreak() {
++        assertThat(Code.longestStreak(""), is(0));
++
++        // other test cases for longestStreak() method
++    }
++
++    @Test
++    public void findsModeFromCharactersInString() {
++
++        assertThat(Code.mode(null), is(nullValue()));
++
++        // other test cases for mode() method
++    }
++
++    @Test
++    public void removesDuplicates() {
++        assertThat(Code.removeDuplicates(arrayOf(1, 1)), is(arrayOf(1)));
++
++        assertThat(Code.removeDuplicates(arrayOf(1, 2, 1, 3, 2)), is(arrayOf(1, 2, 3)));
++
++        assertThat(Code.removeDuplicates(arrayOf(1, 2, 3)), is(arrayOf(1, 2, 3)));
++
++        assertThat(Code.removeDuplicates(arrayOf(100, 0, 3, 100, 0, 4, 562, 4)),
++                is(arrayOf(100, 0, 3, 4, 562)));
++    }
++
++    @Test
++    public void sumsIgnoringDuplicates() {
++        assertThat(Code.sumIgnoringDuplicates(arrayOf(1, 1)), is(1));
++
++        assertThat(Code.sumIgnoringDuplicates(arrayOf(1, 2, 1, 3, 2)), is(6));
++
++        assertThat(Code.sumIgnoringDuplicates(arrayOf(1, 2, 3)), is(6));
++    }
++
++    private int[] arrayOf(int... numbers) {
++        return numbers;
++    }
++
++}
+diff --git a/src/junit/sales/SalesRecord.java b/src/junit/sales/SalesRecord.java
+new file mode 100644
+index 0000000..7785840
+--- /dev/null
++++ b/src/junit/sales/SalesRecord.java
+@@ -0,0 +1,41 @@
++package junit.sales;
++
++public class SalesRecord {
++
++    private String productId;
++    private int productPrice;
++    private int itemsSold;
++
++    public SalesRecord(String productId, int productPrice, int itemsSold) {
++        this.productId = productId;
++        this.productPrice = productPrice;
++        this.itemsSold = itemsSold;
++    }
++
++    public String getProductId() {
++        return productId;
++    }
++
++    public int getProductPrice() {
++        return productPrice;
++    }
++
++    public int getItemsSold() {
++        return itemsSold;
++    }
++
++    @Override
++    public String toString() {
++        return "SalesRecord{" +
++                "productId='" + productId + '\'' +
++                ", productPrice=" + productPrice +
++                ", itemsSold=" + itemsSold +
++                '}';
++    }
++
++    public void setItemsSold(int i) {
++        itemsSold = i;
++
++
++    }
++}
+diff --git a/src/junit/sales/TopSalesFinder.java b/src/junit/sales/TopSalesFinder.java
+new file mode 100644
+index 0000000..b31a07f
+--- /dev/null
++++ b/src/junit/sales/TopSalesFinder.java
+@@ -0,0 +1,33 @@
++package junit.sales;
++
++public class TopSalesFinder {
++    private SalesRecord[] salesRecords;
++    private int salesRecordsCount;
++
++    public TopSalesFinder() {
++        salesRecords = new SalesRecord[10];
++        salesRecordsCount = 0;
++    }
++
++    public void registerSale(SalesRecord record) {
++        if (salesRecordsCount == salesRecords.length) {
++            SalesRecord[] newSalesRecords = new SalesRecord[salesRecords.length * 2];
++            System.arraycopy(salesRecords, 0, newSalesRecords, 0, salesRecords.length);
++            salesRecords = newSalesRecords;
++        }
++        salesRecords[salesRecordsCount++] = record;
++    }
++
++    public String[] findItemsSoldOver(int amount) {
++        String[] itemsSoldOver = new String[salesRecordsCount];
++        int itemsSoldOverCount = 0;
++        for (int i = 0; i < salesRecordsCount; i++) {
++            if (salesRecords[i].getProductPrice() * salesRecords[i].getItemsSold() > amount) {
++                itemsSoldOver[itemsSoldOverCount++] = salesRecords[i].getProductId();
++            }
++        }
++        String[] result = new String[itemsSoldOverCount];
++        System.arraycopy(itemsSoldOver, 0, result, 0, itemsSoldOverCount);
++        return result;
++    }
++}
+\ No newline at end of file
+diff --git a/src/junit/sales/TopSalesFinderTests.java b/src/junit/sales/TopSalesFinderTests.java
+new file mode 100644
+index 0000000..bdfff3c
+--- /dev/null
++++ b/src/junit/sales/TopSalesFinderTests.java
+@@ -0,0 +1,79 @@
++package junit.sales;
++
++import org.junit.Test;
++
++import java.util.Random;
++
++import static org.hamcrest.MatcherAssert.assertThat;
++import static org.hamcrest.Matchers.*;
++
++public class TopSalesFinderTests {
++//The test is testing the findItemsSoldOver method to see if it returns an array of strings that contains the correct items.
++    @Test
++    public void findTopSales() {
++
++        TopSalesFinder tsf = new TopSalesFinder();
++        tsf.registerSale(new SalesRecord("p1", 20, 1));
++        tsf.registerSale(new SalesRecord("p2", 20, 1));
++        tsf.registerSale(new SalesRecord("p2", 20, 1));
++        tsf.registerSale(new SalesRecord("p1", 10, 1));
++        tsf.registerSale(new SalesRecord("p3", 50, 1));
++
++        assertThat(tsf.findItemsSoldOver(10),
++                arrayContainingInAnyOrder("p1", "p2", "p3"));
++
++        assertThat(tsf.findItemsSoldOver(39),
++                arrayContainingInAnyOrder("p2", "p3"));
++
++        assertThat(tsf.findItemsSoldOver(40),
++                arrayContainingInAnyOrder("p3"));
++
++        assertThat(tsf.findItemsSoldOver(50),
++                emptyArray());
++    }
++
++    @Test
++    public void findTopSalesFromGeneratedData() {
++
++        TopSalesFinder tsf = new TopSalesFinder();
++        for (SalesRecord record : generateRecords(10, 10)) {
++            tsf.registerSale(record);
++        }
++
++        assertThat(tsf.findItemsSoldOver(100),
++                arrayContainingInAnyOrder("p1", "p3", "p4"));
++    }
++
++    @Test
++    public void findTopSalesFromMoreGeneratedData() {
++        TopSalesFinder tsf = new TopSalesFinder();
++        for (SalesRecord record : generateRecords(100, 20)) {
++            tsf.registerSale(record);
++        }
++
++        assertThat("There should be 19 items that sold over 100",
++                tsf.findItemsSoldOver(100).length, is(19));
++
++        assertThat("There should be 5 items that sold over 700",
++                tsf.findItemsSoldOver(700).length, is(5));
++
++        assertThat("Items sold over 700 are not correct",
++                tsf.findItemsSoldOver(700),
++                arrayContainingInAnyOrder("p5", "p6", "p11", "p14", "p15"));
++    }
++
++    private SalesRecord[] generateRecords(int recordCount, int differentProductCount) {
++        SalesRecord[] records = new SalesRecord[recordCount];
++
++        Random rand = new Random(0);
++        for (int i = 0; i < recordCount; i++) {
++            String id = "p" + rand.nextInt(differentProductCount);
++            int price = rand.nextInt(50) + 1;
++            int quantity = rand.nextInt(8) + 1;
++
++            records[i] = new SalesRecord(id, price, quantity);
++        }
++
++        return records;
++    }
++}
+-- 
+2.32.0
