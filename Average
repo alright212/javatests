@@ -1,0 +1,12 @@
+/*Write a method that obtains two non-negative integers and finds their average. 
+The average is also an integer, rounded down if necessary. 
+The method returns a word in the format: 
+Average of A and B is C Where A and B are the values of the first and second arguments, respectively, C is the average.*/
+
+public class Exercise {
+    
+    public static String average(int a, int b) {
+        int c = (a + b) / 2;
+        return "Average of " + a + " and " + b + " is " + c;
+    }
+}
