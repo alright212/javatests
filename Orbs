@@ -1,0 +1,352 @@
+/*
+class ResourceStorage:
+public int getResourceAmount (String resource) - returns the amount of the resource. If such a resource does not exist or is exhausted, 0 returns.
+public boolean hasEnoughResource (String resource, int amount) - The method checks to see if there are as many resources in the repository. If the amount is less than 1, returns false.
+public boolean takeResource (String resource, int amount) - A method for extracting a resource. If, for some reason, not so many resources can be extracted, false returns. However, if successful, it returns true.
+*/
+
+
+public class ResourceStorage {
+    private HashMap<String, Integer> resources;
+
+    public ResourceStorage() {
+        this.resources = new HashMap<>();
+    }
+
+    public int getResourceAmount(String resource) {
+        if (this.resources.containsKey(resource)) {
+            return this.resources.get(resource);
+        }
+        return 0;
+    }
+
+    public boolean hasEnoughResource(String resource, int amount) {
+        if (amount < 1) {
+            return false;
+        }
+        if (this.resources.containsKey(resource)) {
+            return this.resources.get(resource) >= amount;
+        }
+        return false;
+    }
+
+    public boolean takeResource(String resource, int amount) {
+        if (amount < 1) {
+            return false;
+        }
+        if (this.resources.containsKey(resource)) {
+            if (this.resources.get(resource) >= amount) {
+                this.resources.put(resource, this.resources.get(resource) - amount);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addResource(String resource, int amount) {
+        if (this.resources.containsKey(resource)) {
+            this.resources.put(resource, this.resources.get(resource) + amount);
+        } else {
+            this.resources.put(resource, amount);
+        }
+    }
+}
+/*class Orb:
+
+public Orb (String creator) - a constructor that names a ball the furnace in which it was manufactured.
+public void charge (String resource, int amount) - load a ball. The energy of the bullet increases by a value equal to the number of characters in the resource name multiplied by the amount. If the resource is dust or the resource name consists only of spaces, nothing happens.
+public int getEnergy () - Returns the current value of energy.
+public String toString () - returns the form Orb by [creator], where [creator] is the name of the oven that produced the bullet. E.g. Orb by Ahi1.*/
+
+public class Orb {
+    private String creator;
+    private int energy;
+
+    public Orb(String creator) {
+        this.creator = creator;
+        this.energy = 0;
+    }
+
+    public void charge(String resource, int amount) {
+        if (resource.equals("dust") || resource.trim().isEmpty()) {
+            return;
+        }
+        this.energy += resource.length() * amount;
+    }
+
+    public int getEnergy() {
+        return this.energy;
+    }
+
+    @Override
+    public String toString() {
+        return "Orb by " + this.creator;
+    }
+}
+/*class Oven:
+public Oven (String name, ResourceStorage resourceStorage) - a constructor that creates an oven instance. Makes the name of the furnace and a reference to the resource repository.
+public String getName () - returns the name of the oven.
+public ResourceStorage getResourceStorage () - returns a reference to the resource repository from which this oven takes resources.
+public int getCreatedOrbsAmount () - returns a number equal to the number of balls already created.
+If the oven creates too many balls, it will break. In the case of a conventional oven, "broken" means that it has formed 15 balls.
+
+public boolean isBroken () - returns true if the oven is broken, or false if it is OK.
+public Optional <Orb> craftOrb () - creates a bullet if the oven is not broken and there are enough resources. If for some reason a bullet cannot be created, returns an empty Optional.*/
+
+public class Oven {
+    private String name;
+    private ResourceStorage resourceStorage;
+    private int createdOrbsAmount;
+
+    public Oven(String name, ResourceStorage resourceStorage) {
+        this.name = name;
+        this.resourceStorage = resourceStorage;
+        this.createdOrbsAmount = 0;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public ResourceStorage getResourceStorage() {
+        return this.resourceStorage;
+    }
+
+    public int getCreatedOrbsAmount() {
+        return this.createdOrbsAmount;
+    }
+
+    public boolean isBroken() {
+        return this.createdOrbsAmount >= 15;
+    }
+
+    public Optional<Orb> craftOrb() {
+        if (this.isBroken()) {
+            return Optional.empty();
+        }
+        if (this.resourceStorage.hasEnoughResource("dust", 1) && this.resourceStorage.hasEnoughResource("fire", 1)) {
+            this.resourceStorage.takeResource("dust", 1);
+            this.resourceStorage.takeResource("fire", 1);
+            this.createdOrbsAmount++;
+            return Optional.of(new Orb(this.name));
+        }
+        return Optional.empty();
+    }
+}
+/*
+class MagicOrb:
+
+Extends the class Orb, that is, a subclass of the class Orb.
+
+Methods:
+
+Same constructor as class Orb.
+The overwritten method public void charge (String resource, int amount) - the same as in the upper class, but receives twice as much energy per month.
+public String toString () - returns the form MagicOrb by [creator], where [creator] is the name of the oven that produced the bullet. E.g. MagicOrb by Ahi1.*/
+
+public class MagicOrb extends Orb {
+    public MagicOrb(String creator) {
+        super(creator);
+    }
+
+    @Override
+    public void charge(String resource, int amount) {
+        super.charge(resource, amount * 2);
+    }
+
+    @Override
+    public String toString() {
+        return "MagicOrb by " + super.toString().substring(4);
+    }
+}
+/*class SpaceOrb:
+
+Extends the class Orb, that is, a subclass of the class Orb.
+Same constructor as class Orb. Sets the energy value to 100.
+Requirement: To maintain the energy value, a new global variable must not be created, but the value of the superclass variable must be changed. Because it has private visibility, it cannot be changed in a subclass. Could it be put on higher visibility? For example, so that all classes in this package can see / change this variable.
+
+The overwritten method public void charge (String resource, int amount) - does nothing. This type of ball cannot be loaded.
+public String toString () - Returns SpaceOrb by [creator], where [creator] is the name of the oven that produced the bullet. E.g. SpaceOrb by Ahi1.
+public boolean absorb (Orb orb) - absorbs the ball. The ball can only be swallowed if it has less energy than the swallow. The energy value of the swallowed ball changes to 0. The energy value of the absorber must increase by the energy value of the absorbed ball. Returns true if the bullet is swallowed, or false if the bullet is stronger.*/
+
+public class SpaceOrb extends Orb {
+    public SpaceOrb(String creator) {
+        super(creator);
+        this.energy = 100;
+    }
+
+    @Override
+    public void charge(String resource, int amount) {
+        return;
+    }
+
+    @Override
+    public String toString() {
+        return "SpaceOrb by " + super.toString().substring(4);
+    }
+
+    public boolean absorb(Orb orb) {
+        if (this.energy > orb.getEnergy()) {
+            this.energy += orb.getEnergy();
+            orb.energy = 0;
+            return true;
+        }
+        return false;
+    }
+}
+/*class MagicOven:
+
+Extends the class Oven, or is a subclass of the class Oven.
+
+Every other moon created is a magic ball (MagicOrb). It breaks after the fifth bullet created.
+
+public MagicOven (String name, ResourceStorage resourceStorage) - constructor.
+The methods isBroken and craftOrb must be overwritten.
+
+The following resources are required to create both an ordinary and a magic bullet: gold x1 and dust x3*/
+
+public class MagicOven extends Oven {
+    public MagicOven(String name, ResourceStorage resourceStorage) {
+        super(name, resourceStorage);
+    }
+
+    @Override
+    public boolean isBroken() {
+        return this.getCreatedOrbsAmount() >= 5;
+    }
+
+    @Override
+    public Optional<Orb> craftOrb() {
+        if (this.isBroken()) {
+            return Optional.empty();
+        }
+        if (this.getResourceStorage().hasEnoughResource("gold", 1) && this.getResourceStorage().hasEnoughResource("dust", 3)) {
+            this.getResourceStorage().takeResource("gold", 1);
+            this.getResourceStorage().takeResource("dust", 3);
+            this.createdOrbsAmount++;
+            if (this.createdOrbsAmount % 2 == 0) {
+                return Optional.of(new MagicOrb(this.getName()));
+            }
+            return Optional.of(new Orb(this.getName()));
+        }
+        return Optional.empty();
+    }
+}
+/*class InfinityMagicOven:
+
+Extends the MagicOven class, or is a subclass of the MagicOven class.
+
+Same as the magic oven, but it never breaks.
+
+public InfinityMagicOven (String name, ResourceStorage resourceStorage) - constructor.
+The following resources are required to create a bullet: gold x1 and dust x3
+
+The isBroken method must be overwritten. What does it have to return if the oven is never broken?*/
+
+public class InfinityMagicOven extends MagicOven {
+    public InfinityMagicOven(String name, ResourceStorage resourceStorage) {
+        super(name, resourceStorage);
+    }
+
+    @Override
+    public boolean isBroken() {
+        return false;
+    }
+}
+/*class SpaceOven:
+
+Extends the class Oven, or is a subclass of the class Oven.
+
+A unique furnace that produces space moons. If there are broken or insufficient resources to produce a space ball, it will produce ordinary moons. However, if there are not enough resources for a regular bullet, the oven will not be able to produce anything. It breaks after the twenty-fifth bullet created.
+
+public SpaceOven (String name, ResourceStorage resourceStorage) - constructor.
+The following resources are required to create a regular bullet: pearl x1, silver x1.
+
+The following resources are needed to create a space ball: meteorite stone x1, star fragment x15.
+
+The craftOrb method must be overwritten. Tip: Because SpaceOrb cannot be loaded, you do not need to do it.*/
+
+public class SpaceOven extends Oven {
+    public SpaceOven(String name, ResourceStorage resourceStorage) {
+        super(name, resourceStorage);
+    }
+
+    @Override
+    public Optional<Orb> craftOrb() {
+        if (this.isBroken()) {
+            return Optional.empty();
+        }
+        if (this.getResourceStorage().hasEnoughResource("meteorite stone", 1) && this.getResourceStorage().hasEnoughResource("star fragment", 15)) {
+            this.getResourceStorage().takeResource("meteorite stone", 1);
+            this.getResourceStorage().takeResource("star fragment", 15);
+            this.createdOrbsAmount++;
+            return Optional.of(new SpaceOrb(this.getName()));
+        }
+        if (this.getResourceStorage().hasEnoughResource("pearl", 1) && this.getResourceStorage().hasEnoughResource("silver", 1)) {
+            this.getResourceStorage().takeResource("pearl", 1);
+            this.getResourceStorage().takeResource("silver", 1);
+            this.createdOrbsAmount++;
+            return Optional.of(new Orb(this.getName()));
+        }
+        return Optional.empty();
+    }
+}
+/*class OrbFactory
+
+A factory with a common resource repository where several furnaces produce balls.
+
+Package: ee.ttu.iti0202.factory
+
+Methods:
+
+public OrbFactory (ResourceStorage resourceStorage) - A class constructor that provides a reference to the resource repository.
+public void addOven (Oven oven) - adds the oven to the factory oven list. Only ovens that have the same resource storage as the factory and are not already on the oven list can be added.
+public List <Oven> getOvens () - returns a list of all ovens running in this factory. The brains in the list must be in the order in which they were added.
+public List <Orb> getAndClearProducedOrbsList () - Returns and clears a list of all bullets. If no new balls have been added yet, returns an empty list.
+public int produceOrbs () - starts all ovens once. The ovens must work in the same order as they were added. All listed balls must be placed in a list, which can later be retrieved using the getAndClearProducedOrbsList () method. The balls must be in the list in the order in which the ovens were operating. Returns the number of balls produced.
+public int produceOrbs (int cycles) - Same as above, but does cycles once.*/
+
+public class OrbFactory {
+    private ResourceStorage resourceStorage;
+    private List<Oven> ovens;
+    private List<Orb> producedOrbs;
+
+    public OrbFactory(ResourceStorage resourceStorage) {
+        this.resourceStorage = resourceStorage;
+        this.ovens = new ArrayList<>();
+        this.producedOrbs = new ArrayList<>();
+    }
+
+    public void addOven(Oven oven) {
+        if (oven.getResourceStorage() == this.resourceStorage && !this.ovens.contains(oven)) {
+            this.ovens.add(oven);
+        }
+    }
+
+    public List<Oven> getOvens() {
+        return this.ovens;
+    }
+
+    public List<Orb> getAndClearProducedOrbsList() {
+        List<Orb> orbs = new ArrayList<>(this.producedOrbs);
+        this.producedOrbs.clear();
+        return orbs;
+    }
+
+    public int produceOrbs() {
+        for (Oven oven : this.ovens) {
+            Optional<Orb> orb = oven.craftOrb();
+            if (orb.isPresent()) {
+                this.producedOrbs.add(orb.get());
+            }
+        }
+        return this.producedOrbs.size();
+    }
+
+    public int produceOrbs(int cycles) {
+        for (int i = 0; i < cycles; i++) {
+            this.produceOrbs();
+        }
+        return this.producedOrbs.size();
+    }
+}
