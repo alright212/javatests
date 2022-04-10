@@ -1,0 +1,15 @@
+//Write a recursive function (without cycles and global variables) that finds several symbols packed in the same index is the same in two words.
+
+public class Exercise {
+    public static int recCount(String first, String second) {
+       
+        if (first.length() == 0 || second.length() == 0) {
+            return 0;
+        }
+        if (first.charAt(0) == second.charAt(0)) {
+            return 1 + recCount(first.substring(1), second.substring(1));
+        } else {
+            return recCount(first.substring(1), second.substring(1));
+        }
+    }
+}
