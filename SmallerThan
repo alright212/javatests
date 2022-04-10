@@ -1,0 +1,17 @@
+Write a method that takes two integers as an argument and returns a word that shows the relationship between the two numbers:
+
+if the numbers are equal, return: "A == B", where A and B are the values of the arguments
+if the numbers are not equal, return: "A <B", where A is the value of the smaller argument and B is the value of the larger argument.
+The returned word has one space before and after the character (either "<" or "=="). There are no more spaces in the word (the remaining symbols are all numbers).
+
+public class Exercise {
+    public static String smallerThan(int a, int b) {
+        if (a == b) {
+            return a + " == " + b;
+        } else if (a > b) {
+            return b + " < " + a;
+        } else {
+            return a + " < " + b;
+        }
+    }
+}
