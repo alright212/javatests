@@ -1,0 +1,370 @@
+/*Class World
+The world includes locations and couriers.
+
+Optional <Location> addLocation (String name, List <String> otherLocations, List <Integer> distances):
+Adds a location with a given name to the world.
+The arguments OtherLocations and distances define the distance to any other existing location.
+If no distance to any other location is given, or if a location named name already exists, Optional.empty () must be returned
+
+Optional <Courier> addCourier (String name, String to):
+Adds a courier named name to the world and puts it in a location named to.
+If a courier with this name already exists or does not exist, Optional.empty () must be returned
+
+The world organizes the activities of couriers, so it must be able to assign strategies to couriers.
+boolean giveStrategy (String name, Strategy strategy):
+If there is no courier with this name, return false, otherwise add the strategy to the corresponding courier and return true
+
+Time must also move forward in the world.
+
+When calling the void tick () method, something must be done with all couriers:
+If the courier is moving between two locations, he must be moved one unit toward that location.
+If the courier starts from a location, he has to ask the strategy for a new action, exchange the required packages with his location and move one unit towards his new target.*/
+
+public class World {
+    private List<Location> locations;
+    private List<Courier> couriers;
+
+    public World() {
+        this.locations = new ArrayList<>();
+        this.couriers = new ArrayList<>();
+    }
+
+    public Optional<Location> addLocation(String name, List<String> otherLocations, List<Integer> distances) {
+        if (locations.stream().anyMatch(location -> location.getName().equals(name))) {
+            return Optional.empty();
+        }
+        Location location = new Location(name);
+        locations.add(location);
+        for (int i = 0; i < otherLocations.size(); i++) {
+            location.addNeighbour(otherLocations.get(i), distances.get(i));
+        }
+        return Optional.of(location);
+    }
+
+    public Optional<Courier> addCourier(String name, String to) {
+        if (couriers.stream().anyMatch(courier -> courier.getName().equals(name))) {
+            return Optional.empty();
+        }
+        Courier courier = new Courier(name, to);
+        couriers.add(courier);
+        return Optional.of(courier);
+    }
+
+    public boolean giveStrategy(String name, Strategy strategy) {
+        Courier courier = couriers.stream().filter(courier1 -> courier1.getName().equals(name)).findFirst().orElse(null);
+        if (courier == null) {
+            return false;
+        }
+        courier.setStrategy(strategy);
+        return true;
+    }
+
+    public void tick() {
+        for (Courier courier : couriers) {
+            if (courier.getTarget() != null) {
+                courier.move();
+            } else {
+                courier.setTarget(courier.getStrategy().nextAction(courier.getLocation()));
+            }
+        }
+    }
+}
+/*Class Packet
+Packet (String name, Location target)
+String getName (): returns the name
+Location getTarget (): Returns the package to its destination*/
+
+public class Packet {
+    private String name;
+    private Location target;
+
+    public Packet(String name, Location target) {
+        this.name = name;
+        this.target = target;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Location getTarget() {
+        return target;
+    }
+}
+/*Class Location
+The location has a name (which must be obtained via the String getName () method) and the number of packages in the Packet. When you create a location object, the name is given as a word.
+
+Integer getDistanceTo (String name): Returns the distance to a location with a given name. If no location with this name exists, Integer.MAX_VALUE returns.
+
+void addPacket (Packet packet): adds the location of the packet
+
+Optional <Packet> getPacket (String name): Returns the package with the given name and the package is removed from the location.
+If no such package exists, Optional.empty () must be returned
+
+public void addDistance (String location, int distance): sets (adds) the distance to the location with the given name*/
+
+public class Location {
+    private String name;
+    private List<Packet> packets;
+    private Map<String, Integer> distances;
+
+    public Location(String name) {
+        this.name = name;
+        this.packets = new ArrayList<>();
+        this.distances = new HashMap<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getDistanceTo(String name) {
+        return distances.getOrDefault(name, Integer.MAX_VALUE);
+    }
+
+    public void addPacket(Packet packet) {
+        packets.add(packet);
+    }
+
+    public Optional<Packet> getPacket(String name) {
+        Optional<Packet> packet = packets.stream().filter(packet1 -> packet1.getName().equals(name)).findFirst();
+        if (packet.isPresent()) {
+            packets.remove(packet.get());
+        }
+        return packet;
+    }
+
+    public void addNeighbour(String location, int distance) {
+        distances.put(location, distance);
+    }
+}
+/*Class Courier
+The courier has a location and a number of parcels that he is currently carrying.
+
+Optional <Location> getLocation (): Returns the current location of the courier.
+If the courier is moving from one point to another, Optional.empty () must be returned
+
+void setStrategy (Strategy strategy): this method must be able to assign a strategy to the courier
+
+Strategy getStrategy (): Returns the strategy assigned to the courier.*/
+
+public class Courier {
+    private String name;
+    private Location location;
+    private List<Packet> packets;
+    private Strategy strategy;
+    private Location target;
+
+    public Courier(String name, String to) {
+        this.name = name;
+        this.location = null;
+        this.packets = new ArrayList<>();
+        this.strategy = null;
+        this.target = null;
+    }
+
+    public Optional<Location> getLocation() {
+        if (target != null) {
+            return Optional.empty();
+        }
+        return Optional.of(location);
+    }
+
+    public void setStrategy(Strategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public Strategy getStrategy() {
+        return strategy;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public void setTarget(Location target) {
+        this.target = target;
+    }
+
+    public Location getTarget() {
+        return target;
+    }
+
+    public void move() {
+        if (target == null) {
+            return;
+        }
+        if (location == null) {
+            location = target;
+            target = null;
+            return;
+        }
+        int distance = location.getDistanceTo(target.getName());
+        if (distance == 1) {
+            location = target;
+            target = null;
+        } else {
+            distance--;
+            location.addNeighbour(target.getName(), distance);
+            target.addNeighbour(location.getName(), distance);
+        }
+    }
+}
+/*Interface Strategy
+Action getAction (): Returns the Action that the courier must perform next
+
+No more methods can be added to the interface.*/
+
+public interface Strategy {
+    Action nextAction(Location location);
+}
+/*Class Action
+public Action (Location location): Creates a destination when a new Action is created.
+
+List <String> getDeposit (): When receiving an action, the courier should first leave the packages in its list in its location.
+
+List <String> getTake (): The courier should then retrieve the packets in this list from its current location.
+
+Location getGoTo (): Finally, the courier must set its location as its next destination.
+
+The void addDeposit (String packetName) and void addTake (String packetName) methods must be able to add to the package packages that need to be dropped or picked up.*/
+
+public class Action {
+    private List<String> deposit;
+    private List<String> take;
+    private Location goTo;
+
+    public Action(Location location) {
+        this.deposit = new ArrayList<>();
+        this.take = new ArrayList<>();
+        this.goTo = location;
+    }
+
+    public List<String> getDeposit() {
+        return deposit;
+    }
+
+    public List<String> getTake() {
+        return take;
+    }
+
+    public Location getGoTo() {
+        return goTo;
+    }
+
+    public void addDeposit(String packetName) {
+        deposit.add(packetName);
+    }
+
+    public void addTake(String packetName) {
+        take.add(packetName);
+    }
+}
+/*Class RandomStrategy
+The RandomStrategy class implements the Strategy interface.
+
+The RandomStrategy class must have a constructor that takes a double as a parameter.
+
+The double parameter is the probability that the courier will move to a random location.
+
+If the probability is 0.5, the courier will move to a random location with a probability of 50%.
+
+If the probability is 0.0, the courier will never move to a random location.
+
+If the probability is 1.0, the courier will always move to a random location.
+
+If the courier moves to a random location, the courier must not take or leave any packages.
+
+If the courier does not move to a random location, the courier must take all the packages in the location and leave all the packages in the list.*/
+
+public class RandomStrategy implements Strategy {
+    private double probability;
+
+    public RandomStrategy(double probability) {
+        this.probability = probability;
+    }
+
+    @Override
+    public Action nextAction(Location location) {
+        if (Math.random() < probability) {
+            return new Action(location);
+        }
+        Action action = new Action(null);
+        for (Packet packet : location.getPackets()) {
+            action.addTake(packet.getName());
+        }
+        return action;
+    }
+}
+/*Class GreedyStrategy
+The GreedyStrategy class implements the Strategy interface.
+
+The GreedyStrategy class must have a constructor that takes a double as a parameter.
+
+The double parameter is the probability that the courier will move to a random location.
+
+If the probability is 0.5, the courier will move to a random location with a probability of 50%.
+
+If the probability is 0.0, the courier will never move to a random location.
+
+If the probability is 1.0, the courier will always move to a random location.
+
+If the courier moves to a random location, the courier must not take or leave any packages.
+
+If the courier does not move to a random location, the courier must take all the packages in the location and leave all the packages in the list.*/
+
+public class GreedyStrategy implements Strategy {
+    private double probability;
+
+    public GreedyStrategy(double probability) {
+        this.probability = probability;
+    }
+
+    @Override
+    public Action nextAction(Location location) {
+        if (Math.random() < probability) {
+            return new Action(location);
+        }
+        Action action = new Action(null);
+        for (Packet packet : location.getPackets()) {
+            action.addTake(packet.getName());
+        }
+        return action;
+    }
+}
+/*Class SmartStrategy
+The SmartStrategy class implements the Strategy interface.
+
+The SmartStrategy class must have a constructor that takes a double as a parameter.
+
+The double parameter is the probability that the courier will move to a random location.
+
+If the probability is 0.5, the courier will move to a random location with a probability of 50%.
+
+If the probability is 0.0, the courier will never move to a random location.
+
+If the probability is 1.0, the courier will always move to a random location.
+
+If the courier moves to a random location, the courier must not take or leave any packages.
+
+If the courier does not move to a random location, the courier must take all the packages in the location and leave all the packages in the list.*/
+
+public class SmartStrategy implements Strategy {
+    private double probability;
+
+    public SmartStrategy(double probability) {
+        this.probability = probability;
+    }
+
+    @Override
+    public Action nextAction(Location location) {
+        if (Math.random() < probability) {
+            return new Action(location);
+        }
+        Action action = new Action(null);
+        for (Packet packet : location.getPackets()) {
+            action.addTake(packet.getName());
+        }
+        return action;
+    }
+}
